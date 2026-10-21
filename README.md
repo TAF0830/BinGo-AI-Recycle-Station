@@ -91,6 +91,10 @@
 ```
 
 ---
+### 🧠 Pre-trained Model
+The pre-trained vision model (`keras_model.h5`) is hosted directly in this repository. 
+- Due to GitHub's file preview limit for binary files, click **[Download](keras_model.h5)** to retrieve the file directly.
+- **Alternative Mirror (Google Drive)**: [Click here to download `keras_model.h5`](https://drive.google.com/file/d/1nq1ntPzDl78SnAsCgqlXIsQ26WdanWg6/view?usp=sharing)
 
 ## 🚀 Getting Started
 
