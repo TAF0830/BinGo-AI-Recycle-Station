@@ -153,10 +153,6 @@ python main.py
 ngrok http 127.0.0.1:5000
 
 ```
-### Mobile Web Interface
-<div align="center">
-  <img src="assets/web.png" alt="Mobile Web Interface" width="380"/>
-</div>
 
 
 
@@ -170,12 +166,6 @@ ngrok http 127.0.0.1:5000
 4. **Deposit Confirmation**: Once the item leaves the camera view for over 1.2 seconds, the station awards eco-points, provides TTS confirmation, and resets the LEDs.
 5. **Reward Redemption**: Accumulated points can be instantly redeemed for merchant vouchers directly inside the digital wallet interface.
 
-## Demonstrations
-
-| Scanning & Detection | Disposal & Reward |
-| :---: | :---: |
-| ![Demo 1](assets/demo.gif) | ![Demo 2](assets/demo1.gif) |
----
 
 ## 📄 License
 
