@@ -27,7 +27,7 @@ def save_user_database(db):
 
 user_database = load_user_database()
 
-# System runtime status: Default no active user on startup, system is locked on standby
+# system operate condition
 station_state = {
     "active_user": None,
     "last_heartbeat": 0,
@@ -36,6 +36,7 @@ station_state = {
     "deposit_status": "Locked: Please scan QR code to start"
 }
 
+# point rule
 REWARD_POINTS = {
     "RECYCLABLE WASTE": 10,
     "SPECIAL WASTE": 15,
@@ -68,20 +69,22 @@ def speak_async(text):
 print("Loading AI vision model...")
 model = keras.models.load_model("keras_model.h5", compile=False)
 
+# follow labels.txt sequence(0 to 4)
 CLASSES = [
-    "FOOD WASTE",
-    "GENERAL WASTE",
-    "RECYCLABLE WASTE",
-    "SPECIAL WASTE",
-    "BACKGROUND"
+    "FOOD WASTE",        # 0
+    "GENERAL WASTE",     # 1
+    "RECYCLABLE WASTE",  # 2
+    "SPECIAL WASTE",     # 3
+    "BACKGROUND"         # 4
 ]
 
+# send to ESP32 instructions
 CMD_MAP = {
-    "FOOD WASTE": b"1",
-    "GENERAL WASTE": b"2",
-    "RECYCLABLE WASTE": b"3",
-    "SPECIAL WASTE": b"4",
-    "BACKGROUND": b"0"
+    "FOOD WASTE": b"1",        # green light (GPIO 7)
+    "GENERAL WASTE": b"2",     # yellow light(GPIO 6)
+    "RECYCLABLE WASTE": b"3",  # white light (GPIO 5)
+    "SPECIAL WASTE": b"4",     # red light (GPIO 4)
+    "BACKGROUND": b"0"         # turn off all light
 }
 
 def vision_loop():
@@ -102,7 +105,7 @@ def vision_loop():
         now = time.time()
         current_user = station_state.get("active_user")
 
-        # 1. If user disconnects or times out (> 8s without heartbeat), auto-lock and reset servo
+        # 1. User disconnected or timed out (> 8s without heartbeat), auto-lock station and reset LEDs/actuators
         if current_user and (now - station_state["last_heartbeat"] > 8):
             print(f"[Session Ended] User {current_user} session closed.")
             station_state["active_user"] = None
@@ -111,10 +114,9 @@ def vision_loop():
             if esp32:
                 esp32.write(b"0")
 
-        # 2. Status check: If no user scanned QR code, lock and display prompt, skip recognition and lid opening
+        # 2. Unauthenticated / QR code not scanned state
         if not current_user:
             station_state["deposit_status"] = "Locked: Please scan QR code to start"
-            # Display large yellow warning on screen: Please scan QR code to start
             cv2.putText(frame, "LOCKED: SCAN QR CODE TO START", (20, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
             cv2.putText(frame, "Waiting for user authentication...", (20, 90),
@@ -124,14 +126,15 @@ def vision_loop():
                 break
             continue
 
-        # 3. User authenticated via QR code, start AI waste classification logic
-        img_resized = cv2.resize(frame, (224, 224), interpolation=cv2.INTER_AREA)
+        # 3. Image preprocessing (convert BGR to RGB, preserve original resize)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img_resized = cv2.resize(frame_rgb, (224, 224), interpolation=cv2.INTER_AREA)
         img_array = np.asarray(img_resized, dtype=np.float32).reshape(1, 224, 224, 3)
         img_norm = (img_array / 127.5) - 1.0
         
         predictions = model.predict(img_norm, verbose=0)
-        idx = np.argmax(predictions)
-        confidence = predictions[0][idx]
+        idx = int(np.argmax(predictions))
+        confidence = float(predictions[0][idx])
         predicted_name = CLASSES[idx]
         
         cv2.putText(frame, f"User: {current_user}", (20, 30),
@@ -145,10 +148,10 @@ def vision_loop():
                     pending_item = predicted_name
                     if esp32 and pending_item in CMD_MAP:
                         esp32.write(CMD_MAP[pending_item])
-                    print(f"[Detected] {pending_item} -> Drop into bin...")
+                    print(f"[Detected] {pending_item} (Conf: {confidence:.2%}) -> Drop into bin...")
                 
                 station_state["deposit_status"] = f"Detected: {pending_item} (Drop into bin)"
-                cv2.putText(frame, f"Detected: {pending_item}", (20, 70),
+                cv2.putText(frame, f"Detected: {pending_item} ({confidence:.0%})", (20, 70),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 165, 255), 2)
                 
         else:
@@ -157,6 +160,7 @@ def vision_loop():
                 if background_start_time == 0:
                     background_start_time = now
                 
+                # Waste removed and background detected for > 1.2s confirms successful deposit
                 if now - background_start_time > 1.2:
                     earned = REWARD_POINTS.get(pending_item, 0)
                     
@@ -174,6 +178,7 @@ def vision_loop():
                     station_state["last_reward"] = earned
                     station_state["deposit_status"] = f"Deposit Confirmed! +{earned} Points"
                     
+                    #Settlement completed, send '0' to turn off all LEDs
                     if esp32:
                         esp32.write(b"0")
                     speak_async(f"Deposit confirmed! {earned} points added.")
@@ -490,7 +495,6 @@ MOBILE_HTML_PAGE = """<!DOCTYPE html>
       updateDashboard();
     }
 
-    // Default auto-connect once for the current mobile device
     toggleSession();
     setInterval(updateDashboard, 1000);
     updateDashboard();
@@ -530,7 +534,6 @@ def active_session():
 def get_user_data():
     uid = request.args.get("user_id")
     
-    # Only refresh heartbeat for the currently active user
     if uid and station_state["active_user"] == uid:
         station_state["last_heartbeat"] = time.time()
         
