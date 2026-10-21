@@ -42,13 +42,23 @@ An edge-computing recycling station running real-time waste classification, pair
 
 2. Install dependencies:
 ```bash
-pip install opencv-python numpy tensorflow tf-keras pyserial pyttsx3 flask```
+pip install opencv-python numpy tensorflow tf-keras pyserial pyttsx3 flask
 
-3.Run the vision station(Terminal 1)
-```bash python main.py```
+```
 
-4.Expose the server for mobile access(Terminal 2)
-ngrok http 5000 --url https://latrine-outscore-wharf.ngrok-free.dev
+3. Run the vision station (Terminal 1):
 
-5.Scan the displayed QR code on your smartphone to start depositing.
-<img width="400" height="400" alt="qr true" src="https://github.com/user-attachments/assets/fda4edab-df00-4c8b-8ac1-894e4c7a31ba" />
+```bash
+python main.py
+
+```
+
+4. Expose the server for mobile access (Terminal 2):
+
+```bash
+ngrok http 5000 --url [https://latrine-outscore-wharf.ngrok-free.dev](https://latrine-outscore-wharf.ngrok-free.dev)
+
+```
+
+5. Scan the displayed QR code on your smartphone to start depositing:
+
