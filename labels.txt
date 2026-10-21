@@ -1,5 +1,5 @@
-0 PAPER
-1 GLASS
-2 PLASTIC
-3 GENERAL WASTE
-4 BACKGROUND
+0 Food Waste
+1 General Waste
+2 Recyclable Waste
+3 Special Waste
+4 Background
