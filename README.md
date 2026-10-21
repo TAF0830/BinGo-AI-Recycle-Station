@@ -61,7 +61,7 @@
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | `0` | **Food Waste** | `b"1"` | GPIO 7 | 🟢 Green | +3 pts |
 | `1` | **General Waste** | `b"2"` | GPIO 6 | 🟡 Yellow | +1 pt |
-| `2` | **Recyclable Waste** | `b"3"` | GPIO 5 | 🔵 Blue / White | +10 pts |
+| `2` | **Recyclable Waste** | `b"3"` | GPIO 5 | ⚪ White | +10 pts |
 | `3` | **Special Waste** | `b"4"` | GPIO 4 | 🔴 Red | +15 pts |
 | `4` | **Background / Idle** | `b"0"` | — | All LEDs OFF | — |
 
