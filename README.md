@@ -155,7 +155,7 @@ ngrok http 127.0.0.1:5000
 ```
 ### Mobile Web Interface
 <div align="center">
-  <img src="assets/web.jpg" alt="Mobile Web Interface" width="380"/>
+  <img src="assets/web.png" alt="Mobile Web Interface" width="380"/>
 </div>
 
 
