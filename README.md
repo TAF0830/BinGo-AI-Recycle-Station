@@ -61,4 +61,5 @@ ngrok http 5000 --url [https://latrine-outscore-wharf.ngrok-free.dev](https://la
 ```
 
 5. Scan the displayed QR code on your smartphone to start depositing:
+​<img width="300" src="https://github.com/user-attachments/assets/fda4edab-df00-4c8b-8ac1-894e4c7a31ba" />
 
